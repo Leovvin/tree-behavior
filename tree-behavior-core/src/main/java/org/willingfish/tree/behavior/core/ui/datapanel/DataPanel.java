@@ -15,10 +15,13 @@ public class DataPanel extends JPanel {
 
     InternalTree internalTree;
     public void refreshTree(IShowTree tree){
-        Graphics g = this.getGraphics();
+        Graphics g = this.getGraphics().create();
+        this.paint(g);
         Graphics2D g2 = (Graphics2D) g;
-        internalTree = treeFactory.generate(tree);
-        internalTree.preOrderTraversal(node->drawNode(g2,node));
+        if (tree.getRoot() != null){
+            internalTree = treeFactory.generate(tree);
+            internalTree.preOrderTraversal(node->drawNode(g2,node));
+        }
     }
 
     private void drawLineBetweenNodes(Graphics2D g2, InternalNode nodeBean){

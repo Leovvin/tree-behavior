@@ -31,7 +31,7 @@ public class SwingContext {
 
             executorService.submit(() -> {
                 try {
-                    SwingUtilities.invokeAndWait(() -> dataPanel.repaint());
+                    SwingUtilities.invokeAndWait(()->optionPanel.setInputValue(""));
                     SwingUtilities.invokeLater(() -> dataPanel.refreshTree(tree));
                 } catch (InterruptedException interruptedException) {
                     interruptedException.printStackTrace();
@@ -44,6 +44,7 @@ public class SwingContext {
             executorService.submit(() -> {
                 try {
                     tree.delete(optionPanel.getInputValue());
+                    SwingUtilities.invokeAndWait(()->optionPanel.setInputValue(""));
                     SwingUtilities.invokeAndWait(() -> {
                         dataPanel.repaint();
                     });
@@ -63,7 +64,13 @@ public class SwingContext {
                     tree.clear();
                     Random random = new Random();
                     random.ints(20, 0, 500)
-                            .forEach(i -> tree.insert(i));
+                            .forEach(i -> {
+                                try {
+                                    tree.insert(i);
+                                }catch (Exception ex){
+                                    ex.printStackTrace();
+                                }
+                            });
 
                     SwingUtilities.invokeAndWait(() -> {
                         dataPanel.repaint();
@@ -78,6 +85,15 @@ public class SwingContext {
                 }
             });
         };
+        ActionListener cleanListener = (e) ->{
+            executorService.submit(() -> {
+                tree.clear();
+
+                SwingUtilities.invokeLater(() -> {
+                    dataPanel.refreshTree(tree);
+                });
+            });
+        };
 
         dataPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         dataPanel.setBackground(Color.decode("#D3D3D3"));
@@ -87,14 +103,18 @@ public class SwingContext {
         JButton rmButton = new JButton("Delete");
         JButton reloadButton = new JButton("Reload");
         JButton nextButton = new JButton("Next");
+        JButton cleanButton = new JButton("Clean");
         addButton.addActionListener(addListener);
         rmButton.addActionListener(deleteListener);
         reloadButton.addActionListener(reloadListener);
+        cleanButton.addActionListener(cleanListener);
         optionPanel.add(input);
         optionPanel.add(addButton);
         optionPanel.add(rmButton);
         optionPanel.add(reloadButton);
         optionPanel.add(nextButton);
+        optionPanel.add(cleanButton);
+
         optionPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         optionPanel.setInput(input);
 

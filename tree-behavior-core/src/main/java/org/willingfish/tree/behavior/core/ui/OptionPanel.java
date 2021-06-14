@@ -15,4 +15,7 @@ public class OptionPanel extends JPanel {
         return inputValue;
     }
 
+    public void setInputValue(String text){
+        input.setText(text);
+    }
 }
